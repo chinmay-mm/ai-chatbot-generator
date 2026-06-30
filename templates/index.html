@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Chatbot Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            🤖 AI Chatbot Assistant
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <div class="bot-message">Hi! Ask me about hours, pricing, or contact info.</div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputBox = document.getElementById("user-input");
+            const message = inputBox.value.trim();
+            if (message === "") return;
+
+            const chatBox = document.getElementById("chat-box");
+
+            // Show user's message
+            chatBox.innerHTML += `<div class="user-message">${message}</div>`;
+            inputBox.value = "";
+
+            // Call backend
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            // Show bot's reply
+            chatBox.innerHTML += `<div class="bot-message">${data.response}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Allow pressing Enter to send
+        document.getElementById("user-input").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
